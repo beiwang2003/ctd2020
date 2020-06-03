@@ -171,7 +171,16 @@ The CMS silicon strip tracker (SST) are organized by Front End Drivers (FEDs). E
 
 Data layout is paramount to the performance, we therefore choose the structure-of-array (SoA) layout. The SoA approach maximizes spatial locality on streaming access and thus improves sustained bandwidth on both modern CPUs and GPUs. The unpacking step transforms all event-based SST data and pre-measured calibration data to the SoA format for providing optimal performance for the clustering step. Specifically, we constructs a map of the channel locations and attributes on CPU. The construction can only be done sequentially, but can overlap with raw data transfer. We then unpack the data to SoA format, which can be done concurrently for each channel. Unpacking is the most time consuming step since it involves irregular data access pattern and is particularly costly on GPU. 
 
-The CMS clustering is based on the ``three thresholds" algorithm~\cite{CMSTWiki}. The parallel implementation is based on the fact that each candidate cluster will have at least one strip with signal to noise ratio larger than the ``seed threshold", which we call seed strips. We start from building an array of indices of seed strips. We then form candidate clusters by determining the left and right boundaries, compute the cluster charge and check it against the ``cluster threshold". Once passing ``three thresholds", we output its left and right boundaries, centroid and optionally ADC values for each cluster. The seed seeking stage can be parallelized over all strips and the cluster forming stage can be parallelized over all seed strips. 
+The CMS clustering is based on the ``three thresholds" algorithm~\cite{CMSTWiki}. The parallel implementation is based on the fact that each candidate cluster will have at least one strip with signal to noise ratio larger than the ``seed threshold", which we call seed strips. We start from building an array of indices of seed strips. We then form clusters by determining the left and right boundaries, compute the cluster charge and check it against the ``cluster threshold" for seed strips. Once passing ``three thresholds", we output its left and right boundaries, centroid and optionally ADC values for each cluster. Figure~\ref{fig:workflow} shows the workflow of the parallel clustering algorithm. The seed seeking stage can be parallelized over all strips and the cluster forming stage can be parallelized over all seed strips. 
+
+\begin{figure}[!htb]
+  \centering
+  % \includegraphics[height=2in]{picture}
+  \includegraphics[scale=0.4]{workflow}
+  \caption{Parallel clustering algorithm workflow}
+  \label{fig:workflow}
+\end{figure}
+
 
 \section{Optimization}
 \label{opt}
